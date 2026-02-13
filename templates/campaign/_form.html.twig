@@ -1,0 +1,67 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="form-group mb-4">
+                {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-bold d-flex align-items-center'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-type text-primary"></i></span>
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'e.g., Strategic Healthcare Expansion'}}) }}
+                </div>
+                {{ form_errors(form.title) }}
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-group mb-4">
+                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 6, 'placeholder': 'Provide a comprehensive overview of the initiative targets and outcomes...'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group mb-4">
+                {{ form_label(form.financialGoal, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-currency-dollar text-primary"></i></span>
+                    {{ form_widget(form.financialGoal, {'attr': {'class': 'form-control', 'placeholder': '0.00'}}) }}
+                </div>
+                {{ form_errors(form.financialGoal) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group mb-4">
+                {{ form_label(form.totalInvestment, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-cash-stack text-primary"></i></span>
+                    {{ form_widget(form.totalInvestment, {'attr': {'class': 'form-control', 'placeholder': '0.00'}}) }}
+                </div>
+                {{ form_errors(form.totalInvestment) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group mb-4">
+                {{ form_label(form.roiPercentage, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-percent text-primary"></i></span>
+                    {{ form_widget(form.roiPercentage, {'attr': {'class': 'form-control', 'placeholder': '0.00'}}) }}
+                </div>
+                {{ form_errors(form.roiPercentage) }}
+            </div>
+        </div>
+
+        <div class="col-12 mt-5">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-primary px-5 py-3 d-flex align-items-center">
+                    <i class="bi bi-cloud-check me-2"></i>
+                    {{ button_label|default('Deploy Changes') }}
+                </button>
+                <a href="{{ path('app_campaign_index') }}" class="btn btn-link text-muted text-decoration-none fw-semibold px-3">
+                    Discard Transitions
+                </a>
+            </div>
+        </div>
+    </div>
+{{ form_end(form) }}

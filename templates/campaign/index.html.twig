@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="mb-5 pb-4">
+        <div class="d-flex justify-content-between align-items-end">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item active">Intelligence Hub</li>
+                    </ol>
+                </nav>
+                <h1 class="display-4 fw-800 mb-0">Active Initiatives</h1>
+                <p class="text-muted fs-5 mt-2">Deploying resources across global strategic programs.</p>
+            </div>
+            <div class="d-none d-lg-block text-end">
+                <div class="small fw-semibold text-primary mb-1 text-uppercase letter-spacing-1">Global Target Meta</div>
+                <div class="h3 fw-bold mb-0 text-dark">$1.2M <span class="text-muted fs-6 fw-normal">Projected</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for campaign in campaigns %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 p-2">
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="d-flex flex-column gap-1">
+                                <div class="badge bg-primary bg-opacity-10 text-primary border-primary border-opacity-10">
+                                    <i class="bi bi-activity me-1"></i> STRATEGIC
+                                </div>
+                                {% if campaign.roiPercentage %}
+                                    <div class="badge bg-success bg-opacity-10 text-success border-success border-opacity-10 mt-1">
+                                        <i class="bi bi-graph-up me-1"></i> ROI: {{ campaign.roiPercentage|number_format(1) }}%
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="text-muted small fw-semibold">ID: #{{ campaign.id|slice(0, 4) }}</div>
+                        </div>
+
+                        <h3 class="h4 mb-3">{{ campaign.title }}</h3>
+                        <p class="text-muted small line-clamp-3 mb-auto">{{ campaign.description|slice(0, 100) }}...</p>
+
+                        {% set percent = (campaign.currentAmount / campaign.financialGoal) * 100 %}
+
+                        <div class="mt-4 pt-4 border-top">
+                            <div class="d-flex justify-content-between align-items-end mb-2">
+                                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">DEPLOYMENT PROGRESS</div>
+                                <div class="h6 mb-0 fw-bold text-primary">{{ percent|number_format(0) }}%</div>
+                            </div>
+                            <div class="progress mb-4">
+                                <div class="progress-bar" role="progressbar" style="width: {{ percent }}%"></div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('app_campaign_show', {'id': campaign.id}) }}" class="btn btn-primary flex-grow-1 shadow-none">
+                                    <i class="bi bi-eye me-2"></i> Details
+                                </a>
+                                <a href="{{ path('app_campaign_edit', {'id': campaign.id}) }}" class="btn btn-light px-3" title="Modify Context">
+                                    <i class="bi bi-gear-fill"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 py-5 text-center">
+                <div class="py-5">
+                    <i class="bi bi-search fs-1 text-muted opacity-25 mb-4 d-block"></i>
+                    <h4 class="text-muted">No initiatives detected in the current sector.</h4>
+                    <p class="text-muted small">Update your filters or check system connectivity.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

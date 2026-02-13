@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard // Business Intelligence{% endblock %}
+
+{% block body %}
+    <div class="mb-5 pb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item active">Operational Overview</li>
+            </ol>
+        </nav>
+        <h1 class="display-4 fw-800 mb-0">Executive Dashboard</h1>
+        <p class="text-muted fs-5 mt-2">Aggregated intelligence and strategic performance metrics.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card p-4 border-start border-4 border-primary">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-0 letter-spacing-1">Gross Impact</h6>
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-3">
+                        <i class="bi bi-wallet2 text-primary"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-800 mb-0">$0.00</h2>
+                <div class="mt-3 d-flex align-items-center small text-success fw-bold">
+                    <i class="bi bi-graph-up-arrow me-2"></i> 0.0% <span class="text-muted fw-normal ms-2">Current Cycle</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-start border-4 border-info">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-0 letter-spacing-1">Verified Donors</h6>
+                    <div class="bg-info bg-opacity-10 p-2 rounded-3">
+                        <i class="bi bi-people text-info"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-800 mb-0">0</h2>
+                <div class="mt-3 d-flex align-items-center small text-muted">
+                    <i class="bi bi-clock me-2"></i> No active sessions detected
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-start border-4 border-success">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-0 letter-spacing-1">Capital Efficiency</h6>
+                    <div class="bg-success bg-opacity-10 p-2 rounded-3">
+                        <i class="bi bi-speedometer2 text-success"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-800 mb-0">0%</h2>
+                <div class="mt-3">
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 pt-4">
+        <div class="card bg-white border-0 shadow-lg">
+            <div class="card-body p-5 text-center">
+                <div class="bg-primary bg-opacity-10 p-4 rounded-circle d-inline-flex mb-4">
+                    <i class="bi bi-cpu text-primary fs-1"></i>
+                </div>
+                <h2 class="fw-800 mb-3">Sector Integration Required</h2>
+                <p class="text-muted mx-auto fs-5 mb-4" style="max-width: 600px;">The intelligence layer is ready to aggregate data from your donation nodes. Connect your primary financial sources to activate real-time reporting.</p>
+                <div class="border-top border-subtle pt-4 mt-2">
+                    <button class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-plug-fill me-2"></i> Configure Data Sources
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
