@@ -41,7 +41,7 @@
                         <h3 class="h4 mb-3">{{ campaign.title }}</h3>
                         <p class="text-muted small line-clamp-3 mb-auto">{{ campaign.description|slice(0, 100) }}...</p>
 
-                        {% set percent = (campaign.currentAmount / campaign.financialGoal) * 100 %}
+                        {% set percent = campaign.financialGoal > 0 ? (campaign.currentAmount / campaign.financialGoal) * 100 : 0 %}
 
                         <div class="mt-4 pt-4 border-top">
                             <div class="d-flex justify-content-between align-items-end mb-2">

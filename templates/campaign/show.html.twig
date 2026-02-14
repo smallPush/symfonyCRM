@@ -56,7 +56,7 @@
             <div class="sticky-top" style="top: 7rem; z-index: 100;">
                 <div class="card p-3">
                     <div class="card-body">
-                        {% set percent = (campaign.currentAmount / campaign.financialGoal) * 100 %}
+                        {% set percent = campaign.financialGoal > 0 ? (campaign.currentAmount / campaign.financialGoal) * 100 : 0 %}
 
                         <div class="mb-4">
                             <div class="small text-muted fw-bold text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.1em;">CAPITAL COMMITTED</div>
