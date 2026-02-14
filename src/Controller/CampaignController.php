@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/campaign')]
 class CampaignController extends AbstractController
@@ -31,6 +32,7 @@ class CampaignController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_campaign_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('CAMPAIGN_EDIT', subject: 'campaign')]
     public function edit(
         Request $request,
         Campaign $campaign,
