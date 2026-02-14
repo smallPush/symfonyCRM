@@ -7,5 +7,12 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
+app_dashboard:
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectToRoute
+    defaults:
+        route: app_campaign_index
+        permanent: false
+
 controllers:
     resource: routing.controllers
