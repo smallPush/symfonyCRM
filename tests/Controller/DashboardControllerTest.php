@@ -12,7 +12,16 @@ final class DashboardControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/');
 
-        $this->assertResponseRedirects('/campaign/');
-        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $response = $client->getResponse();
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSelectorTextContains('h1', 'Executive Dashboard');
+    }
+
+    public function testDashboardNoRedirect(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/');
+
+        $this->assertFalse($client->getResponse()->isRedirect());
     }
 }
