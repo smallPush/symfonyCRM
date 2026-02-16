@@ -3,10 +3,11 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
-class DashboardControllerTest extends WebTestCase
+final class DashboardControllerTest extends WebTestCase
 {
-    public function testDashboardIsSuccessful(): void
+    public function testIndexRedirectsToCampaignIndex(): void
     {
         $client = static::createClient();
         $client->request('GET', '/');
