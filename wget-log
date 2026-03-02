@@ -1,0 +1,6 @@
+failed: Connection timed out.
+Connecting to phar.phpunit.de (phar.phpunit.de)|104.26.0.250|:443... failed: Connection timed out.
+Connecting to phar.phpunit.de (phar.phpunit.de)|104.26.1.250|:443... failed: Connection timed out.
+Connecting to phar.phpunit.de (phar.phpunit.de)|2606:4700:20::681a:1fa|:443... failed: Network is unreachable.
+Connecting to phar.phpunit.de (phar.phpunit.de)|2606:4700:20::ac43:474b|:443... failed: Network is unreachable.
+Connecting to phar.phpunit.de (phar.phpunit.de)|2606:4700:20::681a:fa|:443... failed: Network is unreachable.
