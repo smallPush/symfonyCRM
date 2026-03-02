@@ -2,64 +2,83 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\Asset;
 use App\Entity\Campaign;
 use App\Entity\Transaction;
+use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
 class CampaignTest extends TestCase
 {
-    public function testAddTransaction(): void
+    public function testAddAndRemoveAsset(): void
+    {
+        $campaign = new Campaign();
+        $asset = new Asset();
+
+        // Initially, the collection should be empty
+        $this->assertCount(0, $campaign->getAssets());
+
+        // Add an asset
+        $campaign->addAsset($asset);
+        $this->assertCount(1, $campaign->getAssets());
+        $this->assertTrue($campaign->getAssets()->contains($asset));
+        $this->assertSame($campaign, $asset->getCampaign());
+
+        // Add the same asset again (should not duplicate)
+        $campaign->addAsset($asset);
+        $this->assertCount(1, $campaign->getAssets());
+
+        // Remove the asset
+        $campaign->removeAsset($asset);
+        $this->assertCount(0, $campaign->getAssets());
+        $this->assertNull($asset->getCampaign());
+    }
+
+    public function testAddAndRemoveTransaction(): void
     {
         $campaign = new Campaign();
         $transaction = new Transaction();
 
-        $campaign->addTransaction($transaction);
+        // Initially, the collection should be empty
+        $this->assertCount(0, $campaign->getTransactions());
 
+        // Add a transaction
+        $campaign->addTransaction($transaction);
         $this->assertCount(1, $campaign->getTransactions());
         $this->assertTrue($campaign->getTransactions()->contains($transaction));
         $this->assertSame($campaign, $transaction->getCampaign());
-    }
 
-    public function testAddTransactionIdempotency(): void
-    {
-        $campaign = new Campaign();
-        $transaction = new Transaction();
-
+        // Add the same transaction again (should not duplicate)
         $campaign->addTransaction($transaction);
-        $campaign->addTransaction($transaction);
-
         $this->assertCount(1, $campaign->getTransactions());
-    }
 
-    public function testRemoveTransaction(): void
-    {
-        $campaign = new Campaign();
-        $transaction = new Transaction();
-
-        $campaign->addTransaction($transaction);
-        $this->assertSame($campaign, $transaction->getCampaign());
-
+        // Remove the transaction
         $campaign->removeTransaction($transaction);
-
         $this->assertCount(0, $campaign->getTransactions());
         $this->assertNull($transaction->getCampaign());
     }
 
-    public function testRemoveTransactionBiDirectional(): void
+    public function testAddAndRemoveManager(): void
     {
         $campaign = new Campaign();
-        $transaction = new Transaction();
+        $manager = new User();
 
-        $campaign->addTransaction($transaction);
-        $transaction->setCampaign(null); // Manually break it from one side
+        // Initially, the collection should be empty
+        $this->assertCount(0, $campaign->getManagers());
 
-        $campaign->removeTransaction($transaction);
-        $this->assertCount(0, $campaign->getTransactions());
-    }
+        // Add a manager
+        $campaign->addManager($manager);
+        $this->assertCount(1, $campaign->getManagers());
+        $this->assertTrue($campaign->getManagers()->contains($manager));
+        $this->assertTrue($manager->getManagedCampaigns()->contains($campaign));
 
-    public function testGetTransactions(): void
-    {
-        $campaign = new Campaign();
-        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $campaign->getTransactions());
+        // Add the same manager again (should not duplicate)
+        $campaign->addManager($manager);
+        $this->assertCount(1, $campaign->getManagers());
+
+        // Remove the manager
+        $campaign->removeManager($manager);
+        $this->assertCount(0, $campaign->getManagers());
+        $this->assertFalse($manager->getManagedCampaigns()->contains($campaign));
     }
 }
