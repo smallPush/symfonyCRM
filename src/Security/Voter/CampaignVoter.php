@@ -27,7 +27,7 @@ class CampaignVoter extends Voter
         /** @var Campaign $campaign */
         $campaign = $subject;
 
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        if (in_array(User::ROLE_ADMIN, $user->getRoles(), true)) {
             return true;
         }
 
