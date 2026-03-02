@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CampaignRepository::class)]
 class Campaign
@@ -17,24 +18,34 @@ class Campaign
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Type('string')]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type('array')]
     private ?array $videoConfig = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\PositiveOrZero]
     private ?string $financialGoal = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2, options: ['default' => '0.00'])]
+    #[Assert\NotBlank]
+    #[Assert\PositiveOrZero]
     private ?string $currentAmount = '0.00';
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2, nullable: true)]
+    #[Assert\PositiveOrZero]
     private ?string $totalInvestment = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    #[Assert\PositiveOrZero]
     private ?string $roiPercentage = null;
 
     #[ORM\Column]

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AssetRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 class Asset
@@ -14,12 +15,18 @@ class Asset
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $filename = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
     private ?string $mimeType = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'assets')]

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
@@ -15,15 +16,23 @@ class Transaction
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private ?string $amount = null;
 
     #[ORM\Column(length: 3)]
+    #[Assert\NotBlank]
+    #[Assert\Length(exactly: 3)]
     private ?string $currency = 'USD';
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $stripePaymentIntentId = null;
 
     #[ORM\Column]

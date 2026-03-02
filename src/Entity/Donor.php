@@ -6,6 +6,7 @@ use App\Repository\DonorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DonorRepository::class)]
 class Donor
@@ -16,15 +17,23 @@ class Donor
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 255)]
     private ?string $email = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Length(max: 20)]
     private ?string $phone = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
