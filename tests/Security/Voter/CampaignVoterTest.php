@@ -34,7 +34,7 @@ class CampaignVoterTest extends TestCase
     {
         $voter = $this->createVoter();
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_ADMIN', 'ROLE_USER']);
+        $user->method('getRoles')->willReturn([User::ROLE_ADMIN, User::ROLE_USER]);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
@@ -50,7 +50,7 @@ class CampaignVoterTest extends TestCase
     {
         $voter = $this->createVoter();
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_USER']);
+        $user->method('getRoles')->willReturn([User::ROLE_USER]);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
@@ -68,7 +68,7 @@ class CampaignVoterTest extends TestCase
     {
         $voter = $this->createVoter();
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_USER']);
+        $user->method('getRoles')->willReturn([User::ROLE_USER]);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
