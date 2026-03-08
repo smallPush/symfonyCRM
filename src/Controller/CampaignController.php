@@ -25,6 +25,7 @@ class CampaignController extends AbstractController
         ]);
     }
 
+    #[Cache(smaxage: 3600, public: true)]
     #[Route('/{id}', name: 'app_campaign_show', methods: ['GET'])]
     public function show(Campaign $campaign): Response
     {
