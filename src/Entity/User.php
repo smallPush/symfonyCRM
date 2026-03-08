@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Campaign>
      */
-    #[ORM\ManyToMany(targetEntity: Campaign::class, inversedBy: 'managers')]
+    #[ORM\ManyToMany(targetEntity: Campaign::class, inversedBy: 'managers', fetch: 'EXTRA_LAZY')]
     private Collection $managedCampaigns;
 
     public function __construct()
