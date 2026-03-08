@@ -55,7 +55,7 @@ class Campaign
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'managedCampaigns')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'managedCampaigns', fetch: 'EXTRA_LAZY')]
     private Collection $managers;
 
     public function __construct()
