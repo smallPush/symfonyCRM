@@ -10,6 +10,16 @@ A modern, lightweight CRM built with Symfony 7.4 for managing fundraising campai
 - **Financial Insights**: Track current amounts against goals, investment totals, and ROI (Return on Investment) for each campaign.
 - **Manager Assignment**: Assign users to manage specific campaigns.
 
+## Entities
+
+The application's core domain models are defined in `src/Entity/`:
+
+- **Campaign**: Represents a fundraising initiative, tracking its financial goal, current amount, total investment, ROI, and associated managers, assets, and transactions.
+- **Donor**: Represents an individual contributing to campaigns, storing contact information and linking to their transactions.
+- **Transaction**: Records financial contributions made by Donors towards specific Campaigns, including amount, currency, status, and payment intent details.
+- **Asset**: Represents digital assets (like files, images, or documents) associated with a Campaign.
+- **User**: Represents system users (administrators, managers, etc.) who can be assigned to manage specific Campaigns, using role-based access.
+
 ## Tech Stack
 
 - **Backend**: PHP 8.2+ & Symfony 7.4
