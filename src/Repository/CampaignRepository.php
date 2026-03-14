@@ -15,4 +15,17 @@ class CampaignRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Campaign::class);
     }
+
+    /**
+     * @return Campaign[]
+     */
+    public function findPaginated(int $page, int $limit): array
+    {
+        return $this->findBy(
+            [],
+            ['createdAt' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
+    }
 }

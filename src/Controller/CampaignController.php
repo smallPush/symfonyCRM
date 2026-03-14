@@ -18,10 +18,19 @@ class CampaignController extends AbstractController
 {
     #[Cache(smaxage: 3600, public: true)]
     #[Route('/', name: 'app_campaign_index', methods: ['GET'])]
-    public function index(CampaignRepository $campaignRepository): Response
+    public function index(CampaignRepository $campaignRepository, Request $request): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 9;
+        $totalCount = $campaignRepository->count([]);
+        $lastPage = max(1, (int) ceil($totalCount / $limit));
+        $page = min($page, $lastPage);
+
         return $this->render('campaign/index.html.twig', [
-            'campaigns' => $campaignRepository->findAll(),
+            'campaigns' => $campaignRepository->findPaginated($page, $limit),
+            'current_page' => $page,
+            'last_page' => $lastPage,
+            'limit' => $limit,
         ]);
     }
 
