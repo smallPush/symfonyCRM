@@ -51,6 +51,9 @@ class CampaignHealthTest extends KernelTestCase
 
         $html = $twig->render('campaign/index.html.twig', [
             'campaigns' => [$campaign],
+            'current_page' => 1,
+            'last_page' => 1,
+            'limit' => 9,
         ]);
 
         $this->assertStringContainsString('0%', $html);
