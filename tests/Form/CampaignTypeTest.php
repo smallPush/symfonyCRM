@@ -39,9 +39,9 @@ class CampaignTypeTest extends TypeTestCase
         $this->assertEquals($expected->getTitle(), $model->getTitle());
         $this->assertEquals($expected->getDescription(), $model->getDescription());
         // Doctrine decimals are usually strings in the entity
-        $this->assertEquals((float) $expected->getFinancialGoal(), (float) $model->getFinancialGoal());
-        $this->assertEquals((float) $expected->getTotalInvestment(), (float) $model->getTotalInvestment());
-        $this->assertEquals((float) $expected->getRoiPercentage(), (float) $model->getRoiPercentage());
+        $this->assertEquals((float)$expected->getFinancialGoal(), (float)$model->getFinancialGoal());
+        $this->assertEquals((float)$expected->getTotalInvestment(), (float)$model->getTotalInvestment());
+        $this->assertEquals((float)$expected->getRoiPercentage(), (float)$model->getRoiPercentage());
 
         $view = $form->createView();
         $children = $view->children;
