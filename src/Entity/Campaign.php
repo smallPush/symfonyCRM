@@ -43,7 +43,7 @@ class Campaign
     /**
      * @var Collection<int, Asset>
      */
-    #[ORM\OneToMany(targetEntity: Asset::class, mappedBy: 'campaign', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Asset::class, mappedBy: 'campaign', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $assets;
 
     /**
