@@ -13,10 +13,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class UserRepositoryTest extends TestCase
 {
-    private function createRegistryAndEm(): array
+    private function createRegistryAndEm($mockEm = false): array
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $em = $this->createMock(EntityManagerInterface::class);
+        $registry = $this->createStub(ManagerRegistry::class);
+        $em = $mockEm ? $this->createMock(EntityManagerInterface::class) : $this->createStub(EntityManagerInterface::class);
         $classMetadata = new ClassMetadata(User::class);
 
         $registry->method('getManagerForClass')->willReturn($em);
@@ -31,7 +31,7 @@ class UserRepositoryTest extends TestCase
 
         $repository = new UserRepository($registry);
 
-        $unsupportedUser = $this->createMock(PasswordAuthenticatedUserInterface::class);
+        $unsupportedUser = $this->createStub(PasswordAuthenticatedUserInterface::class);
 
         $this->expectException(UnsupportedUserException::class);
         $this->expectExceptionMessage(sprintf('Instances of "%s" are not supported.', get_class($unsupportedUser)));
@@ -41,7 +41,7 @@ class UserRepositoryTest extends TestCase
 
     public function testUpgradePasswordUpdatesAndPersistsUser(): void
     {
-        [$registry, $em] = $this->createRegistryAndEm();
+        [$registry, $em] = $this->createRegistryAndEm(true);
 
         $user = new User();
         $newPassword = 'new_hashed_password';
