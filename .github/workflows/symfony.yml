@@ -38,9 +38,13 @@ jobs:
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
     - name: Create Database schema
+      env:
+        DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
       run: |
         php bin/console doctrine:schema:create --env=test
     - name: Load Fixtures
+      env:
+        DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
       run: |
         php bin/console doctrine:fixtures:load --env=test --no-interaction
     - name: Install importmap
