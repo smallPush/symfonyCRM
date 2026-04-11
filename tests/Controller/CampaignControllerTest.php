@@ -20,6 +20,14 @@ class CampaignControllerTest extends WebTestCase
         $this->assertStringContainsString('s-maxage=3600', $cacheControl);
     }
 
+    public function testIndexInvalidPageNumber(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/campaign/?page=-1');
+
+        $this->assertResponseIsSuccessful();
+    }
+
     public function testShowCacheHeaders(): void
     {
         $client = static::createClient();
