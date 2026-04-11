@@ -187,11 +187,13 @@ class Campaign
 
     public function removeAsset(Asset $asset): static
     {
-        if ($this->assets->removeElement($asset)) {
-            // set the owning side to null (unless already changed)
-            if ($asset->getCampaign() === $this) {
-                $asset->setCampaign(null);
-            }
+        if (!$this->assets->removeElement($asset)) {
+            return $this;
+        }
+
+        // set the owning side to null (unless already changed)
+        if ($asset->getCampaign() === $this) {
+            $asset->setCampaign(null);
         }
 
         return $this;
@@ -217,11 +219,13 @@ class Campaign
 
     public function removeTransaction(Transaction $transaction): static
     {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getCampaign() === $this) {
-                $transaction->setCampaign(null);
-            }
+        if (!$this->transactions->removeElement($transaction)) {
+            return $this;
+        }
+
+        // set the owning side to null (unless already changed)
+        if ($transaction->getCampaign() === $this) {
+            $transaction->setCampaign(null);
         }
 
         return $this;
@@ -247,9 +251,11 @@ class Campaign
 
     public function removeManager(User $manager): static
     {
-        if ($this->managers->removeElement($manager)) {
-            $manager->removeManagedCampaign($this);
+        if (!$this->managers->removeElement($manager)) {
+            return $this;
         }
+
+        $manager->removeManagedCampaign($this);
 
         return $this;
     }
