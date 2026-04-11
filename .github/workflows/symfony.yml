@@ -52,5 +52,5 @@ jobs:
         php bin/console importmap:install
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
-        DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+        DATABASE_URL: sqlite:///%kernel.project_dir%/var/test.db
       run: vendor/bin/phpunit tests
