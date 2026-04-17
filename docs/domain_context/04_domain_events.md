@@ -1,66 +1,66 @@
-# 4. Eventos de Dominio
+# 4. Domain Events
 
-Los Eventos de Dominio (Domain Events) capturan ocurrencias importantes dentro del dominio en tiempo pasado. Permiten comunicar cambios de estado entre diferentes Aggregate Roots sin acoplarlos fuertemente y alimentan las proyecciones de lectura (CQRS) de manera asíncrona.
+Domain Events capture important occurrences within the domain in the past tense. They allow communicating state changes between different Aggregate Roots without tightly coupling them and feed read projections (CQRS) asynchronously.
 
-A continuación, se enumeran los eventos principales del CRM B2B agrupados por el Agregado que los emite.
+Below are the main events of the B2B CRM grouped by the Aggregate that emits them.
 
-## Relacionados con `Lead`
+## Related to `Lead`
 
 - **`LeadCaptured`**
-  - **Cuándo:** Un nuevo prospecto entra al sistema (ej. formulario web, API).
+  - **When:** A new prospect enters the system (e.g., web form, API).
   - **Payload:** `LeadId`, `Source`, `EmailAddress`, `Timestamp`.
-  - **Reacción típica:** Enviar un email de bienvenida automático, notificar al equipo SDR.
+  - **Typical reaction:** Send an automatic welcome email, notify the SDR team.
 
 - **`LeadQualified`**
-  - **Cuándo:** Un representante de ventas marca el lead como calificado tras un contacto inicial positivo.
+  - **When:** A sales representative marks the lead as qualified after a positive initial contact.
   - **Payload:** `LeadId`, `QualifyingUserId`, `Timestamp`.
-  - **Reacción típica:** Actualizar proyecciones de marketing.
+  - **Typical reaction:** Update marketing projections.
 
 - **`LeadConverted`**
-  - **Cuándo:** El lead se convierte en una cuenta real (`Company`), contacto y posible oportunidad (`Deal`).
+  - **When:** The lead is converted into a real account (`Company`), contact, and possible opportunity (`Deal`).
   - **Payload:** `LeadId`, `GeneratedCompanyId`, `GeneratedContactId`, `GeneratedDealId`, `Timestamp`.
-  - **Reacción típica:** Mover métricas de conversión, disparar flujos de onboarding.
+  - **Typical reaction:** Move conversion metrics, trigger onboarding flows.
 
-## Relacionados con `Company` y Contactos
+## Related to `Company` and Contacts
 
 - **`CompanyRegistered`**
-  - **Cuándo:** Se crea una nueva entidad comercial en el sistema.
+  - **When:** A new business entity is created in the system.
   - **Payload:** `CompanyId`, `CompanyName`, `DomainName`, `OwnerUserId`.
 
 - **`ContactAddedToCompany` / `ContactLinkedToCompany`**
-  - **Cuándo:** Se registra una nueva persona bajo una empresa o un lead convertido crea un contacto.
+  - **When:** A new person is registered under a company or a converted lead creates a contact.
   - **Payload:** `CompanyId`, `ContactId`, `EmailAddress`, `Role`.
-  - **Reacción típica:** Enriquecer datos del contacto con servicios de terceros (Clearbit, Apollo).
+  - **Typical reaction:** Enrich contact data with third-party services (Clearbit, Apollo).
 
-## Relacionados con `Deal` (Pipeline)
+## Related to `Deal` (Pipeline)
 
 - **`DealCreated`**
-  - **Cuándo:** Se abre una nueva oportunidad comercial.
+  - **When:** A new commercial opportunity is opened.
   - **Payload:** `DealId`, `CompanyId`, `EstimatedValue`, `OwnerUserId`.
-  - **Reacción típica:** Notificar al manager si el `EstimatedValue` supera un umbral VIP.
+  - **Typical reaction:** Notify the manager if the `EstimatedValue` exceeds a VIP threshold.
 
 - **`DealStageChanged`**
-  - **Cuándo:** El Deal avanza (o retrocede) en el Pipeline.
+  - **When:** The Deal advances (or goes back) in the Pipeline.
   - **Payload:** `DealId`, `PreviousStage`, `NewStage`, `ChangedByUserId`.
-  - **Reacción típica:** Si pasa a *Proposal*, quizás lanzar una automatización para generar un borrador de contrato; actualizar proyecciones de pipeline.
+  - **Typical reaction:** If it goes to *Proposal*, maybe launch an automation to generate a contract draft; update pipeline projections.
 
 - **`DealWon`**
-  - **Cuándo:** La oportunidad se cierra con éxito.
+  - **When:** The opportunity is successfully closed.
   - **Payload:** `DealId`, `CompanyId`, `FinalValue`, `ClosedByUserId`.
-  - **Reacción típica:** Mandar señal a facturación/ERP, celebrar en Slack/Teams, cambiar el estado del cliente a "Activo".
+  - **Typical reaction:** Send signal to billing/ERP, celebrate in Slack/Teams, change client status to "Active".
 
 - **`DealLost`**
-  - **Cuándo:** La oportunidad se pierde.
+  - **When:** The opportunity is lost.
   - **Payload:** `DealId`, `CompanyId`, `LostReason`, `ClosedByUserId`.
-  - **Reacción típica:** Añadir a campañas de *nurturing* a largo plazo.
+  - **Typical reaction:** Add to long-term *nurturing* campaigns.
 
-## Relacionados con `Activity`
+## Related to `Activity`
 
 - **`ActivityScheduled`**
-  - **Cuándo:** Se planea una llamada, reunión o tarea futura.
+  - **When:** A future call, meeting, or task is planned.
   - **Payload:** `ActivityId`, `Type`, `TargetId`, `OwnerUserId`, `DueDate`.
 
 - **`ActivityCompleted`**
-  - **Cuándo:** El usuario marca la tarea/reunión como realizada.
+  - **When:** The user marks the task/meeting as done.
   - **Payload:** `ActivityId`, `Type`, `TargetId`, `CompletedByUserId`.
-  - **Reacción típica:** Actualizar el campo `LastActivityDate` en la `Company` o `Deal` afectado mediante consistencia eventual.
+  - **Typical reaction:** Update the `LastActivityDate` field in the affected `Company` or `Deal` through eventual consistency.

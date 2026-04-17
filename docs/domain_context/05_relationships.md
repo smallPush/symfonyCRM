@@ -1,36 +1,36 @@
-# 5. Relaciones entre Agregados
+# 5. Relationships between Aggregates
 
-En un diseño correcto de DDD, los Aggregate Roots no deben guardar referencias a otros objetos de memoria (ej. `Deal->getCompany()->getName()`). En su lugar, se relacionan mediante **referencias por ID**. Esto asegura que cada Agregado pueda persistirse independientemente y reduce los bloqueos de base de datos.
+In a correct DDD design, Aggregate Roots should not keep references to other memory objects (e.g., `Deal->getCompany()->getName()`). Instead, they are related through **ID references**. This ensures that each Aggregate can be persisted independently and reduces database locks.
 
-## 1. Relaciones por Referencia de ID (Desacopladas)
+## 1. ID Reference Relationships (Decoupled)
 
 ### `Deal` -> `Company`
-- **Implementación:** `Deal` guarda un `CompanyId` (Value Object o primitivo), no un objeto `Company`.
-- **Ventaja:** Si se actualiza el nombre de la empresa, no afecta a las transacciones que están modificando el Deal.
+- **Implementation:** `Deal` stores a `CompanyId` (Value Object or primitive), not a `Company` object.
+- **Advantage:** If the company name is updated, it does not affect the transactions that are modifying the Deal.
 
 ### `Activity` -> `Target (Deal, Company, Lead)`
-- **Implementación:** Las actividades son polimórficas. Tienen un `TargetId` y un `TargetType` (ej. `Deal`, `Company`).
-- **Ventaja:** La inserción de una nota o reunión no bloquea la fila del Deal o la Empresa en la base de datos.
+- **Implementation:** Activities are polymorphic. They have a `TargetId` and a `TargetType` (e.g., `Deal`, `Company`).
+- **Advantage:** Inserting a note or meeting does not lock the Deal or Company row in the database.
 
-### Cualquier Agregado -> `User`
-- **Implementación:** `OwnerId`, `CreatedById`, `ClosedById`.
-- **Ventaja:** Los datos de usuario (nombre, avatar) cambian muy rara vez. En la base de datos de escritura solo guardamos el ID; la unión con los datos del usuario se hace en las proyecciones de lectura.
+### Any Aggregate -> `User`
+- **Implementation:** `OwnerId`, `CreatedById`, `ClosedById`.
+- **Advantage:** User data (name, avatar) changes very rarely. In the write database we only store the ID; the join with user data is done in the read projections.
 
-## 2. Consistencia Inmediata vs Consistencia Eventual
+## 2. Immediate Consistency vs Eventual Consistency
 
-El límite de transacción en DDD es el Agregado. Todo lo que ocurre *dentro* de un Agregado debe tener **consistencia inmediata** (Transacción ACID). Lo que afecta a *otros* Agregados se maneja mediante eventos y **consistencia eventual**.
+The transaction boundary in DDD is the Aggregate. Everything that happens *inside* an Aggregate must have **immediate consistency** (ACID Transaction). What affects *other* Aggregates is handled through events and **eventual consistency**.
 
-### Consistencia Inmediata (Dentro del Agregado)
-- **Ejemplo:** Al añadir un `Contact` a una `Company` y marcarlo como `Primary`, la regla de "solo puede haber un Primary Contact" debe evaluarse y guardarse en la misma transacción de base de datos.
-- **Ejemplo:** Al cambiar un `Deal` a estado `Won`, el campo `ClosedDate` debe setearse simultáneamente.
+### Immediate Consistency (Inside the Aggregate)
+- **Example:** When adding a `Contact` to a `Company` and marking it as `Primary`, the rule "there can only be one Primary Contact" must be evaluated and saved in the same database transaction.
+- **Example:** When changing a `Deal` to `Won` status, the `ClosedDate` field must be set simultaneously.
 
-### Consistencia Eventual (Entre Agregados)
-- **Ejemplo: `LastActivityDate` en `Company`**
-  - **Problema:** Queremos saber cuándo fue la última vez que interactuamos con una cuenta para reportes.
-  - **Solución eventual:** Cuando una `Activity` se completa, emite el evento `ActivityCompleted`. Un *Event Handler* escucha este evento, carga la `Company` correspondiente (vía `CompanyId`) y actualiza su campo `LastActivityDate`. Esto ocurre milisegundos después y de forma asíncrona.
-- **Ejemplo: Mover a "Cliente"**
-  - **Problema:** Cuando el primer `Deal` se marca como `Won`, la `Company` debería cambiar su status de `Prospect` a `Customer`.
-  - **Solución eventual:** El evento `DealWon` dispara un proceso que envía un comando `UpdateCompanyStatus` al agregado `Company`.
-- **Ejemplo: Eliminación de un Usuario**
-  - **Problema:** Si se da de baja a un `User`, ¿qué pasa con sus Deals?
-  - **Solución eventual:** El evento `UserDeactivated` dispara una reasignación en lote (quizás asíncrona) que envía el comando `ReassignDeal` a todos los deals donde `OwnerId == DeactivatedUserId`. No se intenta hacer todo en una macro-transacción.
+### Eventual Consistency (Between Aggregates)
+- **Example: `LastActivityDate` in `Company`**
+  - **Problem:** We want to know when was the last time we interacted with an account for reports.
+  - **Eventual solution:** When an `Activity` is completed, it emits the `ActivityCompleted` event. An *Event Handler* listens to this event, loads the corresponding `Company` (via `CompanyId`), and updates its `LastActivityDate` field. This happens milliseconds later and asynchronously.
+- **Example: Move to "Customer"**
+  - **Problem:** When the first `Deal` is marked as `Won`, the `Company` should change its status from `Prospect` to `Customer`.
+  - **Eventual solution:** The `DealWon` event triggers a process that sends an `UpdateCompanyStatus` command to the `Company` aggregate.
+- **Example: User Deletion**
+  - **Problem:** If a `User` is deactivated, what happens to their Deals?
+  - **Eventual solution:** The `UserDeactivated` event triggers a batch reassignment (perhaps asynchronous) that sends the `ReassignDeal` command to all deals where `OwnerId == DeactivatedUserId`. It is not attempted to do everything in a macro-transaction.

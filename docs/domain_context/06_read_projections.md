@@ -1,56 +1,56 @@
-# 6. Proyecciones de Lectura (Read Models / CQRS)
+# 6. Read Projections (Read Models / CQRS)
 
-En un sistema diseñado con DDD, el modelo de dominio está altamente optimizado para procesar reglas de negocio complejas (escritura/comandos). Sin embargo, las interfaces de usuario (como las de un CRM) necesitan vistas planas, desnormalizadas y agregadas que serían muy costosas de generar si se tiene que recorrer el árbol de Agregados.
+In a system designed with DDD, the domain model is highly optimized to process complex business rules (write/commands). However, user interfaces (like those of a CRM) need flat, denormalized, and aggregated views that would be very expensive to generate if you had to traverse the Aggregate tree.
 
-Aquí es donde entran las **Proyecciones de Lectura** (Read Models). Escuchan los Eventos de Dominio y actualizan tablas o documentos optimizados para ser consultados rápidamente.
+This is where **Read Projections** (Read Models) come in. They listen to Domain Events and update tables or documents optimized to be queried quickly.
 
-A continuación, las proyecciones más relevantes para el CRM B2B:
+Below are the most relevant projections for the B2B CRM:
 
-## 1. `PipelineBoardView` (Vista Kanban del Pipeline)
-- **Propósito:** Mostrar al comercial sus oportunidades agrupadas por etapa.
-- **Datos desnormalizados:**
+## 1. `PipelineBoardView` (Kanban Pipeline View)
+- **Purpose:** Show the salesperson their opportunities grouped by stage.
+- **Denormalized data:**
   - `DealId`
   - `DealTitle`
   - `EstimatedValue`
   - `Stage`
-  - `CompanyName` (evita tener que hacer un JOIN con la tabla de empresas en tiempo real)
-  - `NextActivityDate` / `HasOverdueTask` (indicadores visuales)
-- **Eventos que la actualizan:** `DealCreated`, `DealStageChanged`, `DealEstimatedValueUpdated`, `ActivityScheduled` (para el indicador).
+  - `CompanyName` (avoids having to do a JOIN with the companies table in real time)
+  - `NextActivityDate` / `HasOverdueTask` (visual indicators)
+- **Events that update it:** `DealCreated`, `DealStageChanged`, `DealEstimatedValueUpdated`, `ActivityScheduled` (for the indicator).
 
-## 2. `ActivityTimeline` (Historial de Actividad)
-- **Propósito:** Renderizar el "feed" de todo lo que ha pasado con un cliente o en un deal sin hacer complejas uniones SQL.
-- **Datos desnormalizados:** Cada fila es un `TimelineEntry` plano.
+## 2. `ActivityTimeline` (Activity History)
+- **Purpose:** Render the "feed" of everything that has happened with a client or in a deal without making complex SQL joins.
+- **Denormalized data:** Each row is a flat `TimelineEntry`.
   - `Timestamp`
   - `Icon/Type` (Email, Call, Note, StatusChange)
-  - `Title` (ej. "Llamada completada", "Movido a Proposal")
-  - `ActorName` (Nombre del usuario que lo hizo)
-  - `Excerpt` (Resumen del texto de la nota o email)
-- **Eventos que la actualizan:** `ActivityCompleted`, `DealStageChanged`, `ContactAddedToCompany`. Una misma línea de tiempo puede mezclar actividades explícitas y eventos de sistema.
+  - `Title` (e.g., "Call completed", "Moved to Proposal")
+  - `ActorName` (Name of the user who did it)
+  - `Excerpt` (Summary of the note or email text)
+- **Events that update it:** `ActivityCompleted`, `DealStageChanged`, `ContactAddedToCompany`. The same timeline can mix explicit activities and system events.
 
-## 3. `CompanyDirectory` (Directorio de Cuentas)
-- **Propósito:** Listado paginado y filtrable de las empresas.
-- **Datos desnormalizados:**
-  - ID, Nombre, Dominio
-  - `PrimaryContactName`, `PrimaryContactEmail` (extraídos de la entidad interna de contacto para no cargar la colección)
-  - `OpenDealsCount`, `TotalPipelineValue` (campos agregados y cacheados)
+## 3. `CompanyDirectory` (Account Directory)
+- **Purpose:** Paginated and filterable list of companies.
+- **Denormalized data:**
+  - ID, Name, Domain
+  - `PrimaryContactName`, `PrimaryContactEmail` (extracted from the internal contact entity so as not to load the collection)
+  - `OpenDealsCount`, `TotalPipelineValue` (aggregated and cached fields)
   - `LastInteractionDate`
-- **Eventos que la actualizan:** `CompanyRegistered`, `DealCreated/Won/Lost`, `ActivityCompleted`.
+- **Events that update it:** `CompanyRegistered`, `DealCreated/Won/Lost`, `ActivityCompleted`.
 
-## 4. `SalesDashboard` (Métricas Comerciales)
-- **Propósito:** Mostrar los KPIs del equipo o de un usuario (Wins, Losses, Win Rate, Average Deal Size).
-- **Datos desnormalizados:** Tablas de agregación por mes/usuario (OLAP ligero).
+## 4. `SalesDashboard` (Commercial Metrics)
+- **Purpose:** Show team or user KPIs (Wins, Losses, Win Rate, Average Deal Size).
+- **Denormalized data:** Aggregation tables by month/user (lightweight OLAP).
   - `YearMonth`
   - `UserId`
   - `TotalWonAmount`
   - `DealsClosedCount`
-- **Eventos que la actualizan:** `DealWon`, `DealLost`. (Ojo: Si un Deal Won cambia su importe a posteriori por corrección, debe haber un evento `DealValueCorrected` que ajuste esta tabla).
+- **Events that update it:** `DealWon`, `DealLost`. (Note: If a Won Deal changes its amount retrospectively for correction, there must be a `DealValueCorrected` event that adjusts this table).
 
-## 5. `UpcomingTasks` (Lista de Tareas Diarias)
-- **Propósito:** "Mi día" para un comercial.
-- **Datos desnormalizados:**
-  - Tareas pendientes ordenadas por fecha.
-  - Contexto incluido (`CompanyName` o `LeadName`) para que no haya que hacer clic para saber a quién llamar.
-- **Eventos que la actualizan:** `ActivityScheduled`, `ActivityCompleted`, `ActivityRescheduled`.
+## 5. `UpcomingTasks` (Daily Task List)
+- **Purpose:** "My day" for a salesperson.
+- **Denormalized data:**
+  - Pending tasks ordered by date.
+  - Included context (`CompanyName` or `LeadName`) so you don't have to click to know who to call.
+- **Events that update it:** `ActivityScheduled`, `ActivityCompleted`, `ActivityRescheduled`.
 
 ---
-**Nota de Arquitectura:** En la v1 (MVP), estas proyecciones pueden ser simples vistas SQL (Views) o tablas de base de datos actualizadas sincrónicamente en la misma transacción que guarda el agregado. A medida que escale, se moverán a bases de datos especializadas (Elasticsearch para búsquedas, Redis para contadores, o bases de datos de documentos como MongoDB/DynamoDB) actualizadas por un bus de eventos asíncrono (RabbitMQ/Kafka).
+**Architecture Note:** In v1 (MVP), these projections can be simple SQL views (Views) or database tables updated synchronously in the same transaction that saves the aggregate. As it scales, they will be moved to specialized databases (Elasticsearch for searches, Redis for counters, or document databases like MongoDB/DynamoDB) updated by an asynchronous event bus (RabbitMQ/Kafka).
