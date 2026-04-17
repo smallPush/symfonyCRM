@@ -1,69 +1,69 @@
 # 3. Value Objects
 
-En el dominio de un CRM B2B, los Value Objects (VO) representan conceptos del negocio que carecen de identidad propia y se definen únicamente por sus atributos. Son inmutables; si se necesita un cambio, se crea un nuevo Value Object.
+In the domain of a B2B CRM, Value Objects (VO) represent business concepts that lack their own identity and are defined solely by their attributes. They are immutable; if a change is needed, a new Value Object is created.
 
-Encapsulan reglas de negocio de bajo nivel, evitando que la lógica de validación se esparza por los servicios de aplicación o los agregados.
+They encapsulate low-level business rules, preventing validation logic from spreading through application services or aggregates.
 
 ## 1. `Money`
-- **Uso:** Importe estimado de un `Deal` o facturación anual de una `Company`.
-- **Atributos:**
-  - `Amount` (Decimal/Entero)
-  - `Currency` (String, ISO 4217 ej. "USD", "EUR")
-- **Reglas:**
-  - `Amount` nunca puede ser negativo en el contexto de un valor estimado de Deal.
-  - No se pueden sumar dos objetos `Money` con diferente `Currency` sin pasar por un servicio de conversión (lanza excepción).
+- **Use:** Estimated amount of a `Deal` or annual billing of a `Company`.
+- **Attributes:**
+  - `Amount` (Decimal/Integer)
+  - `Currency` (String, ISO 4217 e.g. "USD", "EUR")
+- **Rules:**
+  - `Amount` can never be negative in the context of an estimated Deal value.
+  - Two `Money` objects with different `Currency` cannot be added without going through a conversion service (throws exception).
 
 ## 2. `EmailAddress`
-- **Uso:** Correos de un `Contact`, de un `User` o de un `Lead`.
-- **Atributos:**
+- **Use:** Emails of a `Contact`, a `User`, or a `Lead`.
+- **Attributes:**
   - `Value` (String)
-- **Reglas:**
-  - Debe cumplir con una expresión regular o validación estándar de correo electrónico.
-  - (Opcional) Debe estar en minúsculas para comparaciones. No permite espacios.
+- **Rules:**
+  - Must comply with a regular expression or standard email validation.
+  - (Optional) Must be lowercase for comparisons. Does not allow spaces.
 
 ## 3. `PhoneNumber`
-- **Uso:** Teléfono de la `Company` o de un `Contact`.
-- **Atributos:**
+- **Use:** Phone number of the `Company` or a `Contact`.
+- **Attributes:**
   - `Number` (String)
-  - `CountryCode` (String, opcional pero recomendado)
-- **Reglas:**
-  - Debe contener un mínimo de dígitos numéricos y caracteres permitidos (como '+').
-  - Puede validarse usando el estándar E.164.
+  - `CountryCode` (String, optional but recommended)
+- **Rules:**
+  - Must contain a minimum of numeric digits and allowed characters (like '+').
+  - Can be validated using the E.164 standard.
 
-## 4. `DomainName` o `WebsiteUrl`
-- **Uso:** El sitio web o dominio corporativo asociado a una `Company` o `Lead`.
-- **Atributos:**
+## 4. `DomainName` or `WebsiteUrl`
+- **Use:** The website or corporate domain associated with a `Company` or `Lead`.
+- **Attributes:**
   - `Value` (String)
-- **Reglas:**
-  - Debe ser un dominio válido o URL bien formada.
-  - Sirve para agrupar o identificar contactos (ej. si `john@acme.com` entra como Lead, sabemos que pertenece a la Company con dominio `acme.com`).
+- **Rules:**
+  - Must be a valid domain or well-formed URL.
+  - Used to group or identify contacts (e.g., if `john@acme.com` enters as a Lead, we know he belongs to the Company with domain `acme.com`).
 
 ## 5. `DateRange`
-- **Uso:** Rango de fechas para una `Activity` (como una reunión) o para un periodo de proyecciones comerciales.
-- **Atributos:**
+- **Use:** Date range for an `Activity` (like a meeting) or for a period of sales projections.
+- **Attributes:**
   - `StartDate` (DateTime)
   - `EndDate` (DateTime)
-- **Reglas:**
-  - `StartDate` siempre debe ser menor o igual a `EndDate`.
-  - Permite calcular la duración total (`durationInMinutes()`).
+- **Rules:**
+  - `StartDate` must always be less than or equal to `EndDate`.
+  - Allows calculating the total duration (`durationInMinutes()`).
 
-## 6. Estados (State Objects o Enums tipados)
-Los estados complejos también se modelan como Value Objects o Enums, encapsulando las transiciones permitidas.
+## 6. States (State Objects or Typed Enums)
+Complex states are also modeled as Value Objects or Enums, encapsulating the allowed transitions.
 
-### `DealStage` (Etapa de Oportunidad)
-- **Valores posibles:** `Discovery`, `Qualified`, `Proposal`, `Negotiation`, `Won`, `Lost`.
-- **Reglas:**
-  - Puede encapsular lógica como `isTerminal()` (retorna `true` para Won o Lost).
+### `DealStage` (Opportunity Stage)
+- **Possible values:** `Discovery`, `Qualified`, `Proposal`, `Negotiation`, `Won`, `Lost`.
+- **Rules:**
+  - Can encapsulate logic like `isTerminal()` (returns `true` for Won or Lost).
 
 ### `LeadStatus`
-- **Valores posibles:** `New`, `Contacted`, `Qualified`, `Disqualified`, `Converted`.
-- **Reglas:**
-  - `isActionable()` (retorna `false` para Disqualified o Converted).
+- **Possible values:** `New`, `Contacted`, `Qualified`, `Disqualified`, `Converted`.
+- **Rules:**
+  - `isActionable()` (returns `false` for Disqualified or Converted).
 
-## 7. `TaxId` (Identificador Fiscal / VAT Number)
-- **Uso:** Identificador legal de una `Company`.
-- **Atributos:**
+## 7. `TaxId` (Tax Identifier / VAT Number)
+- **Use:** Legal identifier of a `Company`.
+- **Attributes:**
   - `Value` (String)
-- **Reglas:**
-  - Formato validado según el país (ej. NIF en España, EIN en US).
-  - Suele usarse en integraciones con ERPs o bases de datos externas de riesgo crediticio.
+- **Rules:**
+  - Format validated according to the country (e.g., NIF in Spain, EIN in US).
+  - Usually used in integrations with ERPs or external credit risk databases.

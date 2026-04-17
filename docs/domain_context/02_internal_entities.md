@@ -1,44 +1,44 @@
-# 2. Entidades Internas por Agregado
+# 2. Internal Entities per Aggregate
 
-En DDD, las entidades internas viven dentro de las fronteras (boundaries) de un Aggregate Root. Tienen identidad propia dentro de ese contexto, pero **no pueden ser accedidas ni modificadas directamente desde fuera del agregado**. Cualquier modificación debe pasar por el Aggregate Root para garantizar las reglas de negocio e invariantes.
+In DDD, internal entities live within the boundaries of an Aggregate Root. They have their own identity within that context, but **they cannot be accessed or modified directly from outside the aggregate**. Any modification must go through the Aggregate Root to ensure business rules and invariants.
 
-A continuación, se detallan las entidades internas para cada uno de los Aggregate Roots principales definidos.
+Below are the internal entities for each of the defined main Aggregate Roots.
 
-## Dentro del Agregado `Company`
+## Within the `Company` Aggregate
 
-### `Contact` (Contacto)
-- **Qué representa:** Una persona que trabaja para la empresa o que es el punto de contacto dentro de la misma.
-- **Identidad:** Tiene su propio ID (ej. UUID) para poder ser referenciado internamente o desde un Deal/Activity, pero su ciclo de vida depende de `Company`.
-- **Por qué es entidad interna:** Un contacto no existe en el vacío en este CRM B2B. Si la empresa se elimina, sus contactos generalmente se archivan con ella. Modificar un contacto (ej. cambiar su rol a "Decision Maker") debe validarse a nivel de `Company` para asegurar que haya, por ejemplo, al menos un punto de contacto principal.
+### `Contact`
+- **What it represents:** A person who works for the company or who is the point of contact within it.
+- **Identity:** It has its own ID (e.g., UUID) so it can be referenced internally or from a Deal/Activity, but its life cycle depends on `Company`.
+- **Why it is an internal entity:** A contact does not exist in a vacuum in this B2B CRM. If the company is deleted, its contacts are generally archived with it. Modifying a contact (e.g., changing its role to "Decision Maker") must be validated at the `Company` level to ensure that there is, for example, at least one primary point of contact.
 
-### `Address` (Dirección Física / Sede)
-- **Qué representa:** Una ubicación física de la empresa (Sede Central, Oficina Regional, Almacén).
-- **Identidad:** Puede tener un ID propio si la empresa maneja múltiples sedes y se necesita diferenciarlas para facturación o envíos.
-- **Por qué es entidad interna:** Su existencia carece de sentido sin la empresa a la que pertenece.
+### `Address` (Physical Address / Headquarters)
+- **What it represents:** A physical location of the company (Headquarters, Regional Office, Warehouse).
+- **Identity:** It can have its own ID if the company handles multiple locations and needs to differentiate them for billing or shipping.
+- **Why it is an internal entity:** Its existence is meaningless without the company to which it belongs.
 
-## Dentro del Agregado `Deal`
+## Within the `Deal` Aggregate
 
-### `DealNote` (Nota de Oportunidad)
-- **Qué representa:** Un comentario rápido o apunte específico sobre la oportunidad en curso, menos formal que una `Activity` programada.
-- **Identidad:** ID propio para poder ser editada/eliminada.
-- **Por qué es entidad interna:** Es parte del estado interno del Deal. No tiene sentido buscar "todas las notas huérfanas"; siempre se leen junto con el Deal.
+### `DealNote`
+- **What it represents:** A quick comment or specific note about the ongoing opportunity, less formal than a scheduled `Activity`.
+- **Identity:** Own ID so it can be edited/deleted.
+- **Why it is an internal entity:** It is part of the internal state of the Deal. It makes no sense to search for "all orphan notes"; they are always read together with the Deal.
 
-### `DealParticipant` (Participante de la Oportunidad)
-- **Qué representa:** Un `Contact` (referenciado por su ID) que tiene un rol específico en este Deal (ej. "Influencer", "Decision Maker", "Legal Counsel").
-- **Identidad:** ID propio de la relación o identidad local dentro del Deal.
-- **Por qué es entidad interna:** El rol de una persona en un negocio específico es un detalle de ese Deal. Se modifica a través de `Deal->AddParticipant(contactId, role)`.
+### `DealParticipant`
+- **What it represents:** A `Contact` (referenced by its ID) that has a specific role in this Deal (e.g., "Influencer", "Decision Maker", "Legal Counsel").
+- **Identity:** Own ID of the relationship or local identity within the Deal.
+- **Why it is an internal entity:** The role of a person in a specific business is a detail of that Deal. It is modified through `Deal->AddParticipant(contactId, role)`.
 
-## Dentro del Agregado `Activity`
+## Within the `Activity` Aggregate
 
-### `ActivityAttachment` (Adjunto de Actividad)
-- **Qué representa:** Un archivo o documento (ej. un PDF de una propuesta) adjunto a un correo o a las notas de una reunión.
-- **Identidad:** ID interno y referencia al archivo almacenado.
-- **Por qué es entidad interna:** Si se elimina la actividad, los adjuntos también pierden su contexto principal en esta vista.
+### `ActivityAttachment`
+- **What it represents:** A file or document (e.g., a proposal PDF) attached to an email or to meeting notes.
+- **Identity:** Internal ID and reference to the stored file.
+- **Why it is an internal entity:** If the activity is deleted, the attachments also lose their main context in this view.
 
-## ¿Qué NO son entidades internas?
+## What are NOT internal entities?
 
-Es común el error de modelar `Activity` como una entidad interna dentro de `Deal` o `Company`.
-**¿Por qué es un error?**
-- **Concurrencia:** Si un usuario añade una nota a la `Company` mientras otro actualiza la dirección comercial, se produciría un bloqueo en el agregado `Company`.
-- **Paginación/Volumen:** Una `Company` puede tener miles de actividades a lo largo de los años. Cargar el agregado `Company` en memoria con todas sus actividades (o gestionar colecciones gigantes) es ineficiente.
-- Por tanto, `Activity` es su propio Aggregate Root y simplemente hace una referencia (guarda el ID) hacia la `Company` o el `Deal`.
+It is a common mistake to model `Activity` as an internal entity within `Deal` or `Company`.
+**Why is it a mistake?**
+- **Concurrency:** If a user adds a note to the `Company` while another updates the business address, it would cause a block in the `Company` aggregate.
+- **Pagination/Volume:** A `Company` can have thousands of activities over the years. Loading the `Company` aggregate in memory with all its activities (or managing giant collections) is inefficient.
+- Therefore, `Activity` is its own Aggregate Root and simply makes a reference (saves the ID) to the `Company` or the `Deal`.
