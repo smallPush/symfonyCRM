@@ -22,7 +22,7 @@ class CampaignController extends AbstractController
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 9;
-        $totalCount = $campaignRepository->count([]);
+        $totalCount = $campaignRepository->countAll();
         $lastPage = max(1, (int) ceil($totalCount / $limit));
         $page = min($page, $lastPage);
 
