@@ -28,4 +28,15 @@ class CampaignRepository extends ServiceEntityRepository
             ($page - 1) * $limit
         );
     }
+
+    /**
+     * Optimized count using QueryBuilder to avoid generic overhead.
+     */
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
