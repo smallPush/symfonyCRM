@@ -12,6 +12,14 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        $this->loadDonors($manager);
+        $this->loadCampaigns($manager);
+
+        $manager->flush();
+    }
+
+    private function loadDonors(ObjectManager $manager): void
+    {
         // 1. Create a Test Donor
         $donor = new Donor();
         $donor->setFirstName('John')
@@ -19,7 +27,10 @@ class AppFixtures extends Fixture
             ->setEmail('john.doe@example.com')
             ->setPhone('+34600000000');
         $manager->persist($donor);
+    }
 
+    private function loadCampaigns(ObjectManager $manager): void
+    {
         // 2. Create Sample Campaigns
         $campaignData = [
             [
@@ -60,7 +71,5 @@ class AppFixtures extends Fixture
             
             $manager->persist($asset);
         }
-
-        $manager->flush();
     }
 }
