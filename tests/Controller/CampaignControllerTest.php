@@ -285,4 +285,62 @@ class CampaignControllerTest extends WebTestCase
         $this->assertEquals('Updated Campaign Title', $updatedCampaign->getTitle());
         $this->assertEquals(120000.00, (float)$updatedCampaign->getFinancialGoal());
     }
+
+
+    public function testEditFormSubmissionHandlesException(): void
+    {
+        $client = static::createClient();
+        $container = static::getContainer();
+        try {
+            $em = $container->get('doctrine')->getManager();
+            $campaign = $em->getRepository(\App\Entity\Campaign::class)->findOneBy([]);
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Test skipped: Database/Schema missing.');
+            return;
+        }
+
+        $uniqueEmail = 'error_test_' . uniqid() . '@example.com';
+        $user = new \App\Entity\User();
+        $user->setEmail($uniqueEmail);
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_ADMIN']);
+        $em->persist($user);
+        $em->flush();
+
+        $client->loginUser($user);
+
+        if (!$campaign) {
+            $this->markTestSkipped('No campaign found.');
+        }
+        $campaignId = $campaign->getId();
+
+        $client->disableReboot();
+
+        // Get the crawler for the edit form
+        $crawler = $client->request('GET', '/campaign/' . $campaignId . '/edit');
+
+        // Now that the container for this request is created and won't be rebooted,
+        // we can attach the listener to the actual EntityManager that will be used for submit.
+        $actualEm = $client->getContainer()->get('doctrine')->getManager();
+        $actualEm->getEventManager()->addEventListener([\Doctrine\ORM\Events::preFlush], new class {
+            public function preFlush() {
+                throw new \Exception('Database error');
+            }
+        });
+
+        $form = $crawler->selectButton('Deploy Changes')->form([
+            'campaign[title]' => 'Failing Update Title',
+            'campaign[financialGoal]' => '10000.00'
+        ]);
+
+        $client->submit($form);
+
+        // The form should re-render with a 200 status code and the error flash message
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSelectorTextContains('.alert-danger', 'An error occurred while saving the campaign.');
+
+        // Remove the listener so it doesn't affect other tests (though we use fresh client/container per test)
+    }
+
 }
