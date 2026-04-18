@@ -53,6 +53,8 @@ class AppFixtures extends Fixture
             ]
         ];
 
+        $batchSize = 20;
+        $i = 0;
         foreach ($campaignData as $data) {
             $campaign = new Campaign();
             $campaign->setTitle($data['title'])
@@ -70,6 +72,15 @@ class AppFixtures extends Fixture
                 ->setCampaign($campaign);
             
             $manager->persist($asset);
+
+            $i++;
+            if (($i % $batchSize) === 0) {
+                $manager->flush();
+                $manager->clear();
+            }
         }
+
+        $manager->flush();
+        $manager->clear();
     }
 }
