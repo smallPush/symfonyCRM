@@ -33,6 +33,35 @@ class CampaignControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testIndexWithZeroCampaignsMocked(): void
+    {
+        $client = static::createClient();
+
+        $campaignRepositoryMock = $this->createMock(\App\Repository\CampaignRepository::class);
+        $campaignRepositoryMock->expects($this->once())
+            ->method('countAll')
+            ->willReturn(0);
+        $campaignRepositoryMock->expects($this->once())
+            ->method('findPaginated')
+            ->willReturn([]);
+
+        static::getContainer()->set(\App\Repository\CampaignRepository::class, $campaignRepositoryMock);
+
+        $crawler = $client->request('GET', '/campaign/?page=1');
+
+        $this->assertResponseIsSuccessful();
+
+        // In Symfony tests with Twig, we can assert on the rendered HTML or use the profiler.
+        // Let's assert on the HTML content that confirms 0 campaigns.
+        $this->assertCount(0, $crawler->filter('.col-lg-4.col-md-6'));
+
+        // Assert that the "No initiatives detected" text is shown
+        $this->assertSelectorTextContains('h4.text-muted', 'No initiatives detected in the current sector.');
+
+        // Assert that pagination is NOT shown, which implies last_page <= 1
+        $this->assertCount(0, $crawler->filter('nav[aria-label="Campaign pagination"]'));
+    }
+
     public function testIndexPageLimit(): void
     {
         $client = static::createClient();
