@@ -33,6 +33,48 @@ class CampaignControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testIndexPageLimit(): void
+    {
+        $client = static::createClient();
+        $container = static::getContainer();
+        try {
+            $em = $container->get('doctrine')->getManager();
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Test skipped: Database/Schema missing.');
+            return;
+        }
+
+        // Clean up existing campaigns to ensure we know exactly how many there are
+        $campaigns = $em->getRepository(\App\Entity\Campaign::class)->findAll();
+        foreach ($campaigns as $campaign) {
+            $em->remove($campaign);
+        }
+        $em->flush();
+
+        // Create 10 campaigns
+        for ($i = 1; $i <= 10; $i++) {
+            $campaign = new \App\Entity\Campaign();
+            $campaign->setTitle('Test Campaign ' . $i);
+            $campaign->setFinancialGoal('10000.00');
+            $em->persist($campaign);
+        }
+        $em->flush();
+
+        // Request page 1
+        $crawler = $client->request('GET', '/campaign/?page=1');
+        $this->assertResponseIsSuccessful();
+
+        // There should be exactly 9 items on the first page
+        $this->assertCount(9, $crawler->filter('.col-lg-4.col-md-6'));
+
+        // Request page 2
+        $crawler = $client->request('GET', '/campaign/?page=2');
+        $this->assertResponseIsSuccessful();
+
+        // There should be exactly 1 item on the second page
+        $this->assertCount(1, $crawler->filter('.col-lg-4.col-md-6'));
+    }
+
     public function testShowCacheHeaders(): void
     {
         $client = static::createClient();
