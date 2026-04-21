@@ -54,11 +54,15 @@ class CampaignController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            try {
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Campaign updated successfully.');
+                $this->addFlash('success', 'Campaign updated successfully.');
 
-            return $this->redirectToRoute('app_campaign_show', ['id' => $campaign->getId()], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_campaign_show', ['id' => $campaign->getId()], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'An error occurred while saving the campaign.');
+            }
         }
 
         return $this->render('campaign/edit.html.twig', [
