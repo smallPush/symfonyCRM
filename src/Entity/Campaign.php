@@ -49,7 +49,7 @@ class Campaign
     /**
      * @var Collection<int, Transaction>
      */
-    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'campaign')]
+    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'campaign', fetch: 'EXTRA_LAZY')]
     private Collection $transactions;
 
     /**
