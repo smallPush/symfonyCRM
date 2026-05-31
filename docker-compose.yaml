@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-symfony_crm}
       POSTGRES_USER: ${POSTGRES_USER:-symfony_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
     volumes:
       - .:/var/www/html
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER:-symfony_user}:${POSTGRES_PASSWORD:-!ChangeMe!}@db:5432/${POSTGRES_DB:-symfony_crm}?serverVersion=16&charset=utf8"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-symfony_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-symfony_crm}?serverVersion=16&charset=utf8"
     depends_on:
       - db
 
